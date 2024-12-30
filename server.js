@@ -5,9 +5,11 @@ const { MongoClient, ServerApiVersion, ObjectId, } = require("mongodb");
 const { createServer } = require("node:http");
 const { v4: uuidv4 } = require("uuid")
 const WebSocket = require('ws');
+require('dotenv').config()
+
 // MongoDB connection URI
 const uri =
-  "mongodb+srv://admin:Lolking0912@cluster0.zw3b3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+  "mongodb+srv://admin:" + process.env.PASSWORD +"@cluster0.zw3b3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,

@@ -24,8 +24,8 @@
 
 
     <script>
-        const socket = new WebSocket('ws://localhost:3000'); // Replace with your WebSocket server URL
-
+        const socket = new WebSocket(''); // Replace with your WebSocket server URL
+        var url = ""
         var id;
 
         socket.onmessage = (event) => {
@@ -51,7 +51,7 @@
         var stories;
         var currentName = ""
         setInterval(() => {
-            fetch('http://localhost:3000')
+            fetch(url)
                 .then(response => response.json())
                 .then(data => {
                     stories = data
@@ -88,7 +88,7 @@
                     console.log(key)
 
                     console.log(stories[key][0]._id)
-                    fetch('http://localhost:3000/submit', {
+                    fetch(url + '/submit', {
                         method: 'POST',  // Set method to POST
                         headers: {
                             'Content-Type': 'application/json',  // Specify that the data is in JSON format
@@ -110,7 +110,7 @@
 
                 console.log(`${index} ${length}`)
                 if (index >= length) {
-                    fetch('http://localhost:3000/submit', {
+                    fetch(url + '/submit', {
                         method: 'POST',  // Set method to POST
                         headers: {
                             'Content-Type': 'application/json',  // Specify that the data is in JSON format
@@ -137,7 +137,7 @@
 
         function enterStory() {
 
-            fetch('http://localhost:3000/submit', {
+            fetch(url + '/submit', {
                 method: 'POST',  // Set method to POST
                 headers: {
                     'Content-Type': 'application/json',  // Specify that the data is in JSON format
