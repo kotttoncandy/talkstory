@@ -1,0 +1,172 @@
+<html>
+
+
+<head>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="titleDiv">
+        <h1 id="title">TalkStory</h1>
+        <h4 id="title2">write the next event without any context</h4>
+
+    </div>
+
+    <h4 id="story">...</h4>
+    <textarea id="content" contenteditable="true" placeholder="type what happens next here"></textarea>
+
+    <div id="buttons">
+        <button onclick="enterStory()">enter!!!!</button>
+
+        <button onclick="getStory()">skip</button>
+    </div>
+
+
+
+    <script>
+        const socket = new WebSocket('ws://localhost:3000'); // Replace with your WebSocket server URL
+
+        var id;
+
+        socket.onmessage = (event) => {
+            id = String(event.data)
+        }
+
+        function shuffleDictionary(obj) {
+            const keys = Object.keys(obj);
+            for (let i = keys.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [keys[i], keys[j]] = [keys[j], keys[i]];
+            }
+
+            const shuffledObj = {};
+            for (const key of keys) {
+                shuffledObj[key] = obj[key];
+            }
+            return shuffledObj;
+        }
+
+
+
+        var stories;
+        var currentName = ""
+        setInterval(() => {
+            fetch('http://localhost:3000')
+                .then(response => response.json())
+                .then(data => {
+                    stories = data
+                })
+                .catch(err => console.error('Fetch error:', err));
+        }, 100); // Poll every second
+
+        setTimeout(() => {
+            getStory()
+
+
+        }, 200)
+
+        function getStory() {
+            var index = 0
+            if (stories == null) return;
+
+            document.getElementById('content').value = ""
+
+            stories = shuffleDictionary(stories)
+            console.log(stories)
+
+            for (const key in stories) {
+                index++;
+                if (!stories[key][0].isActive && !stories[key][0].isFull) {
+
+                    console.log("lkdsfj;sadjl;f")
+
+                    var story = stories[key][0].story
+                    var last = story[stories[key][0].story.length - 1]
+
+                    document.getElementById("story").textContent = last
+
+                    console.log(key)
+
+                    console.log(stories[key][0]._id)
+                    fetch('http://localhost:3000/submit', {
+                        method: 'POST',  // Set method to POST
+                        headers: {
+                            'Content-Type': 'application/json',  // Specify that the data is in JSON format
+                        },
+                        body: JSON.stringify({
+                            type: "isActive",
+                            value: true,
+                            name: key,
+                            id: stories[key][0]._id,
+                            clientID: id
+
+                        }),
+                    })
+
+                    currentName = key
+                    break;
+                }
+                const length = Object.keys(stories).length;
+
+                console.log(`${index} ${length}`)
+                if (index >= length) {
+                    fetch('http://localhost:3000/submit', {
+                        method: 'POST',  // Set method to POST
+                        headers: {
+                            'Content-Type': 'application/json',  // Specify that the data is in JSON format
+                        },
+                        body: JSON.stringify({
+                            type: "createNewStory",
+
+                            value: true,
+                            name: key,
+                            id: stories[key][0]._id,
+                            clientID: id
+
+                        }),
+                    })
+
+                    setTimeout(() => {
+                        getStory()
+                    }, 2000)
+
+                    break;
+                }
+            }
+        }
+
+        function enterStory() {
+
+            fetch('http://localhost:3000/submit', {
+                method: 'POST',  // Set method to POST
+                headers: {
+                    'Content-Type': 'application/json',  // Specify that the data is in JSON format
+                },
+                body: JSON.stringify({
+                    type: "updateStory",
+                    value: document.getElementById("content").value,
+                    name: currentName,
+                    id: stories[currentName][0]._id,
+                    clientID: id
+
+                }),
+            })
+
+            setTimeout(() => {
+                getStory()
+            }, 1000)
+        }
+
+
+        function completedStories() {
+            window.location.href = `stories.html`
+
+        }
+
+    </script>
+
+    <button onclick="completedStories()" id="completedButton">see completed stories!!</button>
+
+</body>
+
+</html>

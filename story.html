@@ -1,0 +1,46 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="container2">
+
+    <button class="back" onclick="back()">back</button>
+
+    </div>
+    <script>
+
+        var stories;
+        var currentName = ""
+        setInterval(() => {
+            fetch('http://localhost:3000')
+                .then(response => response.json())
+                .then(data => {
+                    stories = data
+                })
+                .catch(err => console.error('Fetch error:', err));
+        }, 100); // Poll every second
+        const urlParams = new URLSearchParams(window.location.search);
+
+        setTimeout(() => {
+            var elements = stories[urlParams.get('name')][0].story
+            elements.forEach(element => {
+                var newDiv = document.createElement("div")
+                newDiv.innerHTML = element
+                document.getElementById('container2').appendChild(newDiv)
+            });
+
+
+        }, 250);
+
+        function back() {
+            window.location.href = `stories.html`
+
+        }
+
+    </script>
+</body>
+
+</html>

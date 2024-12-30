@@ -1,0 +1,58 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <button class="back" onclick="back()">back</button>
+
+    <div id="container">
+
+    </div>
+
+    <script>
+        var stories
+        var parsedStories = {}
+        setInterval(() => {
+            fetch('http://localhost:3000')
+                .then(response => response.json())
+                .then(data => {
+                    stories = data
+                })
+                .catch(err => console.error('Fetch error:', err));
+
+            for (const key in stories) {
+                if (stories[key][0].isFull) {
+                    parsedStories[key] = stories[key]
+                }
+            }
+        }, 100);
+
+        setTimeout(() => {
+
+            for (const story in parsedStories) {
+                var newDiv = document.createElement("div")
+                newDiv.innerHTML = stories[story][0].story[Math.floor(Math.random() * 7)]
+                newDiv.id = story
+                newDiv.addEventListener('click', (c) => {
+                    console.log(c.target.id)
+                    const id = encodeURIComponent(c.target.id);
+                    window.location.href = `story.html?name=${id}`
+                })
+                document.getElementById("container").appendChild(newDiv)
+                console.log( parsedStories[story][0].story)
+            }
+
+        }, 250);
+
+        function back() {
+            window.location.href = `/`
+
+        }
+
+
+    </script>
+</body>
+
+</html>
